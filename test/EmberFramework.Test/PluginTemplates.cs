@@ -26,6 +26,15 @@ public class PluginWithoutInitializer2 : IPlugin
         return ValueTask.FromResult<IServiceCollection>(serviceCollection);
     }
 }
+public class PluginWithoutInitializerButWithExternalInitializer : IPlugin
+{
+    public ValueTask<IServiceCollection> BuildComponents(CancellationToken cancellationToken = default)
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddSingleton<IComponentInitializer, ComponentInitializer>();
+        return ValueTask.FromResult<IServiceCollection>(serviceCollection);
+    }
+}
 public class PluginWithoutInitializerButReferenceServiceInParent(PluginDummyServiceInParent service) : IPlugin
 {
     public PluginDummyServiceInParent ParentService => service;

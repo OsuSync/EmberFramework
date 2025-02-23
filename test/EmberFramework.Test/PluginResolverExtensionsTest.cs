@@ -122,13 +122,21 @@ public class PluginResolverExtensionsTest
             r => r.Activator.LimitType.Name == nameof(PluginWithoutInitializer2));
         Assert.Contains(registerScope.ComponentRegistry.Registrations,
             r => r.Activator.LimitType.Name == nameof(PluginWithoutInitializerButReferenceServiceInParent));
+        Assert.Contains(registerScope.ComponentRegistry.Registrations,
+            r => r.Activator.LimitType.Name == nameof(PluginWithoutInitializerButWithExternalInitializer));
 
-        var pluginObj = executeScope.Resolve(ctx.LoadPluginTypes()
+        var refTestPluginObj = executeScope.Resolve(ctx.LoadPluginTypes()
             .First(t => t.Name == nameof(PluginWithoutInitializerButReferenceServiceInParent)))!;
         
-        var result = pluginObj.GetType().GetProperty("ParentService")!.GetMethod?.Invoke(pluginObj, []);
+        var parentServiceInPlugin = refTestPluginObj.GetType().GetProperty("ParentService")!.GetMethod?.Invoke(refTestPluginObj, []);
+        Assert.Equivalent(parent.Resolve<PluginDummyServiceInParent>(), parentServiceInPlugin);
+
+        await executeScope.InitializePluginScope(TestContext.Current.CancellationToken);
         
-        Assert.Equivalent(parent.Resolve<PluginDummyServiceInParent>(), result);
+        var initialObj = executeScope.Resolve<IEnumerable<IComponentInitializer>>()
+            .First(c => c.GetType().Name == nameof(ComponentInitializer));
+        var calledObj = initialObj.GetType().GetProperty("IsInitializeCalled")!.GetMethod?.Invoke(initialObj, []);
+        Assert.True((bool)calledObj!);
     }
 
     [Fact]
