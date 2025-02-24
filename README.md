@@ -10,7 +10,7 @@ A lightweight plugin framework inspired from EmberTools.
 var root = await RootBuilder
     .Boot()
     .Infrastructures((registry, config) => registry.AddSingleton(...))
-    .UseLoader<PluginLoader>() // defualt load location is $cwd/plugins
+    .UseLoader<PluginLoader>() // load plugins from $cwd/plugins in default
     .UseLoader<CustomLoader>() // support multiple loader
     .Build();
 

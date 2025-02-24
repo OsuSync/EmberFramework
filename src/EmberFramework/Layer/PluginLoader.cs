@@ -42,24 +42,20 @@ public class PluginLoader(ILifetimeScope parent, IConfiguration config) : IPlugi
         }
     }
 
-    private async IAsyncEnumerable<T> ResolveService<T>() where T : notnull
+    public async IAsyncEnumerable<T> ResolveServiceAsync<T>(
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        where T : notnull
     {
         foreach (var (_, containers) in _pluginContainers)
         {
             foreach (var resolver in containers.Resolve<IEnumerable<IPluginResolver>>())
             {
-                await foreach (var service in resolver.ResolveServiceAsync<T>())
+                await foreach (var service in resolver.ResolveServiceAsync<T>(cancellationToken))
                 {
                     yield return service;
                 }
             }
         }
-    }
-    
-    public IAsyncEnumerable<T> ResolveServiceAsync<T>(CancellationToken cancellationToken = default)
-        where T : notnull
-    {
-        return ResolveService<T>();
     }
     
     public async ValueTask DisposeAsync()
