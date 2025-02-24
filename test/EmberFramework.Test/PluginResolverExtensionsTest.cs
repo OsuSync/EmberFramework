@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Runtime.Loader;
 using Autofac;
 using EmberFramework.Abstraction.Layer.Plugin;
 using EmberFramework.Layer;
@@ -17,7 +16,6 @@ public class PluginResolverExtensionsTest
         builder.RegisterType<T>().AsSelf().As<TAlias>().SingleInstance();
         return builder.Build();
     }
-    private static ILifetimeScope MakeSingleAnyScope<T>() where T : notnull => MakeSingleAnyScope<T, T>() ;
     private static ILifetimeScope MakeAnyScope<T1, T2, TAlias>()
         where T2 : TAlias
         where T1 : TAlias
@@ -126,7 +124,7 @@ public class PluginResolverExtensionsTest
             r => r.Activator.LimitType.Name == nameof(PluginWithoutInitializerButWithExternalInitializer));
 
         var refTestPluginObj = executeScope.Resolve(ctx.LoadPluginTypes()
-            .First(t => t.Name == nameof(PluginWithoutInitializerButReferenceServiceInParent)))!;
+            .First(t => t.Name == nameof(PluginWithoutInitializerButReferenceServiceInParent)));
         
         var parentServiceInPlugin = refTestPluginObj.GetType().GetProperty("ParentService")!.GetMethod?.Invoke(refTestPluginObj, []);
         Assert.Equivalent(parent.Resolve<PluginDummyServiceInParent>(), parentServiceInPlugin);
