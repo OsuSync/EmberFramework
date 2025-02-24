@@ -53,7 +53,7 @@ public class Root(
     }
 
     public async IAsyncEnumerable<T> ResolveServiceAsync<T>(
-        [EnumeratorCancellation] CancellationToken cancellationToken = default) where T : notnull
+        [EnumeratorCancellation] CancellationToken cancellationToken = default) where T : class
     {
         foreach (var pluginManager in pluginLoaders)
         {

@@ -20,21 +20,19 @@ public class PluginResolver(
         await _pluginExecuteScopes.InitializePluginScope(cancellationToken);
     }
 
-    public IAsyncEnumerable<T> ResolveServiceAsync<T>(CancellationToken cancellationToken = default) where T : notnull
+    public IAsyncEnumerable<T> ResolveServiceAsync<T>(CancellationToken cancellationToken = default) where T : class
     {
         if (_pluginExecuteScopes is null) return AsyncEnumerable.Empty<T>();
-        
-        var service = _pluginExecuteScopes.Resolve<T>();
 
-        return AsyncEnumerable.Repeat(service, 1);
+        return !_pluginExecuteScopes.TryResolve<T>(out var service)
+            ? AsyncEnumerable.Empty<T>()
+            : AsyncEnumerable.Repeat(service, 1);
     }
     
     public void Dispose()
     {
         GC.SuppressFinalize(this);
-        using var r = _pluginRegisterScopes;
-        using var e = _pluginExecuteScopes;
-        context.Unload();
+        DisposeAsync().AsTask().Wait();
     }
 
     public async ValueTask DisposeAsync()

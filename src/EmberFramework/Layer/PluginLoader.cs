@@ -44,7 +44,7 @@ public class PluginLoader(ILifetimeScope parent, IConfiguration config) : IPlugi
 
     public async IAsyncEnumerable<T> ResolveServiceAsync<T>(
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
-        where T : notnull
+        where T : class
     {
         foreach (var (_, containers) in _pluginContainers)
         {

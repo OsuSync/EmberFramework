@@ -42,4 +42,9 @@
       <ProjectReference Include="..\EmberFramework.Test.SeparatedDummies\EmberFramework.Test.SeparatedDummies.csproj" />
     </ItemGroup>
 
+    <Target Name="CopyAsStandalonePlugins" AfterTargets="Build">
+        <Copy
+            SourceFiles="$(TargetDir)$(ProjectName).dll;"
+            DestinationFolder="$(TargetDir)\Plugins\EmberTest" />
+    </Target>
 </Project>
