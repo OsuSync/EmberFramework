@@ -30,7 +30,7 @@
     <Target Name="CopyAsStandalonePlugins" AfterTargets="Build">
         <Copy
             SourceFiles="$(TargetDir)$(ProjectName).dll;"
-            DestinationFolder="$(TargetDir)\Plugins\EmberTest" />
+            DestinationFolder="$(TargetDir)\plugins\EmberTest" />
     </Target>
     
     <ItemGroup>
