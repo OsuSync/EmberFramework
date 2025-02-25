@@ -11,6 +11,9 @@ namespace EmberFramework.Layer;
 
 public class PluginLoader(ILifetimeScope parent, IConfiguration config) : IPluginLoader
 {
+    
+    public const string DefaultPluginFolder = "plugins";
+    
     private readonly Dictionary<PluginMetadata, ILifetimeScope> _pluginContainers = [];
 
     public async ValueTask BuildScopeAsync(CancellationToken cancellationToken = default)

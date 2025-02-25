@@ -8,9 +8,10 @@ namespace EmberFramework.Layer;
 
 public static class PluginLoaderExtensions
 {
+    
     public static string GetPluginFolderPath(this IConfiguration configuration)
     {
-        var dir = configuration.GetSection(nameof(PluginLoader))["Path"] ?? "plugins";
+        var dir = configuration.GetSection(nameof(PluginLoader))["Path"] ?? PluginLoader.DefaultPluginFolder;
 
         return Path.GetFullPath(dir);
     }

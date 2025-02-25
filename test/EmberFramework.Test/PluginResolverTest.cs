@@ -12,7 +12,7 @@ public class PluginResolverTest
     private static ILifetimeScope BuildEmptyRootScope()
     {
         var builder = new ContainerBuilder();
-        var pluginMetadata = new PluginMetadata(Path.Combine(Environment.CurrentDirectory, "Plugins"));
+        var pluginMetadata = new PluginMetadata(Path.Combine(Environment.CurrentDirectory, PluginLoader.DefaultPluginFolder));
         builder.RegisterInstance(pluginMetadata);
         builder.Register(_ => pluginMetadata.MakeLocalAssemblyLoadContext());
         builder.RegisterType<PluginResolver>().SingleInstance();
@@ -23,7 +23,7 @@ public class PluginResolverTest
     private static ILifetimeScope BuildRootScope()
     {
         var builder = new ContainerBuilder();
-        var pluginMetadata = new PluginMetadata(Path.Combine(Environment.CurrentDirectory, "Plugins", "EmberTest"));
+        var pluginMetadata = new PluginMetadata(Path.Combine(Environment.CurrentDirectory, PluginLoader.DefaultPluginFolder, "EmberTest"));
         builder.RegisterInstance(pluginMetadata);
         builder.Register(_ => pluginMetadata.MakeLocalAssemblyLoadContext());
         builder.RegisterType<PluginResolver>().SingleInstance();

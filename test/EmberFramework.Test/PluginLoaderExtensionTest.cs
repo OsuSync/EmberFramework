@@ -26,7 +26,7 @@ public class PluginLoaderExtensionTest
     public void TestGetPluginRootFromConfigurationReturnDefaultIfNotSetup()
     {
         var configRoot = new ConfigurationRoot([]);
-        var pluginsPath = Path.Combine(Environment.CurrentDirectory, "plugins");
+        var pluginsPath = Path.Combine(Environment.CurrentDirectory, PluginLoader.DefaultPluginFolder);
         
         Assert.Equal(pluginsPath, configRoot.GetPluginFolderPath());
     }
@@ -61,10 +61,10 @@ public class PluginLoaderExtensionTest
     [Fact]
     public void TestEnumAllPluginsFolder()
     {
-        var path = Path.Combine(Environment.CurrentDirectory, "Plugins");
+        var path = Path.Combine(Environment.CurrentDirectory, PluginLoader.DefaultPluginFolder);
         var result = PluginLoaderExtensions.EnumPluginFoldersAsync(path).ToList();
         
-        var target = Path.Combine(Environment.CurrentDirectory, "Plugins", "EmberTest");
+        var target = Path.Combine(Environment.CurrentDirectory, PluginLoader.DefaultPluginFolder, "EmberTest");
         Assert.Contains(result, x => x == target);
         Assert.Single(result);
     }
