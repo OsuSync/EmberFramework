@@ -22,7 +22,7 @@ public class RootBuilder
             .Register(ctx => new AutofacServiceProvider(ctx.Resolve<ILifetimeScope>()))
             .As<IServiceProvider>()
             .SingleInstance();
-        _containerBuilder.RegisterType<Root>().As<IRoot>().SingleInstance();
+        _containerBuilder.RegisterType<PluginRoot>().As<IPluginRoot>().SingleInstance();
         _containerBuilder.RegisterInstance(this);
     }
 
@@ -41,9 +41,9 @@ public class RootBuilder
         return this;
     }
 
-    public IRoot Build()
+    public IPluginRoot Build()
     {
-        return _containerBuilder.Build().Resolve<IRoot>();
+        return _containerBuilder.Build().Resolve<IPluginRoot>();
     }
     
     public static RootBuilder Boot(Action<IConfigurationBuilder> builder)

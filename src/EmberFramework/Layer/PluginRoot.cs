@@ -1,21 +1,19 @@
 ﻿using System.Runtime.CompilerServices;
 using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using EmberFramework.Abstraction;
 using EmberFramework.Abstraction.Layer;
 using EmberFramework.Abstraction.Layer.Plugin;
 
 namespace EmberFramework.Layer;
 
-public class Root(
+public class PluginRoot(
     ILifetimeScope parent,
-    IEnumerable<IGracefulExitHandler> gracefulExitHandlers,
     IEnumerable<IPluginLoader> pluginLoaders)
-    : IRoot
+    : IPluginRoot
 {
     private async ValueTask ExitAsync(CancellationToken cancellationToken = default)
     {
-        foreach (var exitHandler in gracefulExitHandlers)
+        await foreach (var exitHandler in GetExitHandlersAsync(cancellationToken))
         {
             try
             {
@@ -28,6 +26,13 @@ public class Root(
         }
     }
 
+    private IAsyncEnumerable<IGracefulExitHandler> GetExitHandlersAsync(CancellationToken cancellationToken = default)
+    {
+        return pluginLoaders.ToAsyncEnumerable()
+            .SelectMany(loader => loader.ResolveServiceAsync<IGracefulExitHandler>(cancellationToken))
+            .Concat(parent.Resolve<IEnumerable<IGracefulExitHandler>>().ToAsyncEnumerable());
+    }
+    
     private IAsyncEnumerable<IExecutable> GetExecutablesAsync(CancellationToken cancellationToken = default)
     {
         return pluginLoaders.ToAsyncEnumerable()
@@ -36,6 +41,8 @@ public class Root(
     
     public async ValueTask RunAsync(CancellationToken cancellationToken = default)
     {
+        await BuildScopeAsync(cancellationToken);
+        
         var allExecutables = await GetExecutablesAsync(cancellationToken)
             .ToListAsync(cancellationToken);
         
@@ -66,7 +73,6 @@ public class Root(
     public async ValueTask DisposeAsync()
     {
         GC.SuppressFinalize(this);
-        
         await ExitAsync();
         foreach (var loader in pluginLoaders)
             await using (loader) {}

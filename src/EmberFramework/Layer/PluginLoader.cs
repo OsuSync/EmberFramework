@@ -13,32 +13,16 @@ public class PluginLoader(ILifetimeScope parent, IConfiguration config) : IPlugi
 {
     private readonly Dictionary<PluginMetadata, ILifetimeScope> _pluginContainers = [];
 
-    private static async ValueTask<PluginMetadata> GetMetadataAsync(string pluginFolder,
-        CancellationToken cancellationToken = default)
-    {
-        var pluginJsonPath = Path.Combine(pluginFolder, "plugin.json");
-        if (!File.Exists(pluginJsonPath)) return new PluginMetadata(pluginFolder);
-        
-        await using var sr = File.OpenRead(pluginJsonPath);
-        var metadataJson = await JsonSerializer.DeserializeAsync<PluginMetadataJson>(sr, cancellationToken: cancellationToken);
-        
-        if (metadataJson == null) return new PluginMetadata(pluginFolder);
-
-        return new PluginMetadata(pluginFolder)
-        {
-            Id = metadataJson.Id,
-            Name = metadataJson.Name,
-            Description = metadataJson.Description,
-            RepositoryUrl = metadataJson.RepositoryUrl,
-            Version = metadataJson.Version,
-        };
-    }
-    
     public async ValueTask BuildScopeAsync(CancellationToken cancellationToken = default)
     {
         await foreach (var metadata in GetPlugins(cancellationToken))
         {
             await LoadAsync(metadata, cancellationToken);
+            
+            foreach (var pluginResolver in _pluginContainers[metadata].Resolve<IEnumerable<IPluginResolver>>())
+            {
+                await pluginResolver.BuildScopeAsync(cancellationToken);
+            }
         }
     }
 
@@ -69,24 +53,14 @@ public class PluginLoader(ILifetimeScope parent, IConfiguration config) : IPlugi
 
     public void Dispose()
     {
-        GC.SuppressFinalize(this);
-        foreach (var container in _pluginContainers.Values) using (container) {}
-
-        _pluginContainers.Clear();
+        DisposeAsync().AsTask().Wait();
     }
 
-    public async IAsyncEnumerable<PluginMetadata> GetPlugins(
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<PluginMetadata> GetPlugins(CancellationToken cancellationToken = default)
     {
-        var pluginDir = config.GetSection(nameof(PluginLoader))["Path"] ?? "plugins";
-        
-        if (!Directory.Exists(pluginDir)) Directory.CreateDirectory(pluginDir);
-
-        foreach (var directory in Directory.EnumerateDirectories(pluginDir))
-        {
-            var pluginFolder = Path.GetFullPath(Path.Combine(pluginDir, directory));
-            yield return await GetMetadataAsync(pluginFolder, cancellationToken);
-        }
+        var path = config.GetPluginFolderPath();
+        return PluginLoaderExtensions.EnumPluginFoldersAsync(path).ToAsyncEnumerable()
+            .SelectAwait(p => PluginLoaderExtensions.GetMetadataByPathAsync(p, cancellationToken));
     }
 
     public bool IsLoaded(PluginMetadata metadata)
@@ -98,15 +72,9 @@ public class PluginLoader(ILifetimeScope parent, IConfiguration config) : IPlugi
     {
         if (IsLoaded(metadata)) return ValueTask.CompletedTask;
         
-        var collection = new ServiceCollection();
-        collection.AddSingleton(config);
-        collection.AddSingleton(metadata);
-        collection.AddSingleton(metadata.MakeLocalAssemblyLoadContext);
-        collection.AddSingleton<PluginResolver>();
-
         _pluginContainers.Add(metadata, parent.BeginLifetimeScope((builder) =>
         {
-            builder.Populate(collection);
+            builder.Populate(metadata.BuildPluginScope(config));
         }));
         
         return ValueTask.CompletedTask;

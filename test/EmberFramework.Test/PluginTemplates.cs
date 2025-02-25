@@ -1,6 +1,8 @@
-﻿using EmberFramework.Abstraction.Layer.Plugin;
+﻿using EmberFramework.Abstraction;
+using EmberFramework.Abstraction.Layer.Plugin;
 using EmberFramework.Test.SeparatedDummies;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace EmberFramework.Test;
 
@@ -23,6 +25,8 @@ public class PluginWithoutInitializer2 : IPlugin
     {
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddSingleton<PluginDummyService2>();
+        serviceCollection.AddSingleton<IGracefulExitHandler, ExitHandlerInPlugin>();
+        serviceCollection.AddSingleton<IExecutable, ExecuteHandler>();
         return ValueTask.FromResult<IServiceCollection>(serviceCollection);
     }
 }
@@ -74,5 +78,46 @@ public class ComponentInitializer : IComponentInitializer
         IsInitializeCalled = true;
 
         return default;
+    }
+}
+
+public class TestHandler : IGracefulExitHandler, ICallRecord
+{
+    public bool IsCalled { get; private set; }
+    public ValueTask ExitAsync(CancellationToken cancellationToken = default)
+    {
+        IsCalled = true;
+        return ValueTask.CompletedTask;
+    }
+}
+    
+public class ExecuteHandler : IExecutable, ICallRecord
+{
+    public bool IsCalled { get; private set; }
+    public ValueTask RunAsync(CancellationToken cancellationToken = default)
+    {
+        IsCalled = true;
+        return ValueTask.CompletedTask;
+    }
+}
+
+
+public class ExceptionThrownExitHandler : IGracefulExitHandler, ICallRecord
+{
+    public bool IsCalled { get; private set; }
+    public ValueTask ExitAsync(CancellationToken cancellationToken = default)
+    {
+        IsCalled = true;
+        throw new Exception();
+    }
+}
+
+public class ExitHandlerInPlugin : IGracefulExitHandler, ICallRecord
+{
+    public bool IsCalled { get; private set; }
+    public ValueTask ExitAsync(CancellationToken cancellationToken = default)
+    {
+        IsCalled = true;
+        return ValueTask.CompletedTask;
     }
 }

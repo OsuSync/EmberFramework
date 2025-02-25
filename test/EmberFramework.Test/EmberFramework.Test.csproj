@@ -42,6 +42,12 @@
       <ProjectReference Include="..\EmberFramework.Test.SeparatedDummies\EmberFramework.Test.SeparatedDummies.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="plugin.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
     <Target Name="CopyAsStandalonePlugins" AfterTargets="Build">
         <Copy
             SourceFiles="$(TargetDir)$(ProjectName).dll;"

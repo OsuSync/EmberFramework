@@ -1,6 +1,6 @@
 Ember Framework
 ----
-A lightweight plugin framework inspired from EmberTools.
+A lightweight plugin framework.
 
 
 ## Usage
@@ -34,10 +34,10 @@ class MyPlugin : IPlugin
     }
 }
 
-// Configure your services
-class MyServiceConfigurer(MyService myService, ...) : IComponentInitializer
+// Initialize your services
+class MyServiceInitializer(MyService myService, ...) : IComponentInitializer
 {
-    async ValueTask InitializeAsync(CancellationToken cancellationToken = default)
+    public async ValueTask InitializeAsync(CancellationToken cancellationToken = default)
     {
         await myService.Connect(...);
     }

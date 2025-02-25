@@ -23,10 +23,10 @@ public class PluginResolver(
     public IAsyncEnumerable<T> ResolveServiceAsync<T>(CancellationToken cancellationToken = default) where T : class
     {
         if (_pluginExecuteScopes is null) return AsyncEnumerable.Empty<T>();
-
-        return !_pluginExecuteScopes.TryResolve<T>(out var service)
+        
+        return !_pluginExecuteScopes.TryResolve<IEnumerable<T>>(out var services)
             ? AsyncEnumerable.Empty<T>()
-            : AsyncEnumerable.Repeat(service, 1);
+            : services.ToAsyncEnumerable();
     }
     
     public void Dispose()
