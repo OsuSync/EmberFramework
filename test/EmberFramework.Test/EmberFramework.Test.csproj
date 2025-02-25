@@ -32,4 +32,9 @@
             SourceFiles="$(TargetDir)$(ProjectName).dll;"
             DestinationFolder="$(TargetDir)\Plugins\EmberTest" />
     </Target>
+    
+    <ItemGroup>
+        <None Include="../../README.md" Pack="true" PackagePath="/"/>
+        <None Include="../../LICENSE" Pack="true" PackagePath="/"/>
+    </ItemGroup>
 </Project>
