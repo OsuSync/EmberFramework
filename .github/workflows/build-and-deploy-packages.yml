@@ -14,13 +14,20 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 9.0.x
+        
     - name: Restore dependencies
       run: dotnet restore
       working-directory: ./
+      
+    - name: Run unit test
+      run: dotnet test
+      working-directory: ./
+      
     - name: Build
       run: dotnet pack
       working-directory: ./
+      
     - name: publish-to-nuget
-      run: dotnet nuget push ./src/**/*.nupkg --api-key=${{secrets.NUGET_KEY}} --skip-duplicate --source=https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./**/*.nupkg --api-key=${{secrets.NUGET_KEY}} --skip-duplicate --source=https://api.nuget.org/v3/index.json
       working-directory: ./src
     
