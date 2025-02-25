@@ -1,13 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <ItemGroup>
-      <ProjectReference Include="..\EmberFramework.Abstraction\EmberFramework.Abstraction.csproj" />
-      <PackageReference Include="Microsoft.Extensions.Configuration"/>
-      <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine"/>
-      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Json"  />
-      <PackageReference Include="Autofac" />
-      <PackageReference Include="Autofac.Extensions.DependencyInjection" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
-      <PackageReference Include="System.Linq.Async" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EmberFramework.Abstraction\EmberFramework.Abstraction.csproj"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json"/>
+    <PackageReference Include="Autofac"/>
+    <PackageReference Include="Autofac.Extensions.DependencyInjection"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
+    <PackageReference Include="System.Linq.Async"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/"/>
+    <None Include="../../LICENSE" Pack="true" PackagePath="/"/>
+  </ItemGroup>
+
 </Project>
