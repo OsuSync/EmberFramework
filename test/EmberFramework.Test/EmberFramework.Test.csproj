@@ -1,30 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
         <OutputType>Exe</OutputType>
-        <RootNamespace>EmberFramework.Test</RootNamespace>
-        <TargetFramework>net9.0</TargetFramework>
-        <!--
-        To enable the Microsoft Testing Platform 'dotnet test' experience, add property:
-          <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
-    
-        To enable the Microsoft Testing Platform native command line experience, add property:
-          <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
-    
-        For more information on Microsoft Testing Platform support in xUnit.net, please visit:
-          https://xunit.net/docs/getting-started/v3/microsoft-testing-platform
-        -->
     </PropertyGroup>
-
-    <ItemGroup>
-        <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Using Include="Xunit"/>
-    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk"/>
@@ -34,12 +12,13 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <ProjectReference Include="..\..\src\EmberFramework\EmberFramework.csproj" />
+        <ProjectReference Include="..\EmberFramework.Test.SeparatedDummies\EmberFramework.Test.SeparatedDummies.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\EmberFramework.Abstraction\EmberFramework.Abstraction.csproj" />
-      <ProjectReference Include="..\..\src\EmberFramework\EmberFramework.csproj" />
-      <ProjectReference Include="..\EmberFramework.Test.SeparatedDummies\EmberFramework.Test.SeparatedDummies.csproj" />
+        <Using Include="Xunit"/>
+        <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest"/>
     </ItemGroup>
 
     <ItemGroup>
