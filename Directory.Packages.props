@@ -3,7 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     <NoWarn>$(NoWarn);NU1507</NoWarn>
-    <Version>1.0.0-alpha.2</Version>
+    <Version>1.0.0-alpha.3</Version>
     <Authors>OsuSync</Authors>
     <PackageTags>plugin;plugin-framework</PackageTags>
     <RepositoryUrl>https://github.com/OsuSync/EmberFramework</RepositoryUrl>
