@@ -15,7 +15,7 @@ public class RootBuilder
     private List<Type> _pluginLoaderTypes = [];
     public IEnumerable<Type> PluginLoaderTypes => _pluginLoaderTypes;
     
-    private RootBuilder(IConfigurationRoot configurationRoot)
+    public RootBuilder(IConfigurationRoot configurationRoot)
     {
         _configurationRoot = configurationRoot;
         _containerBuilder
