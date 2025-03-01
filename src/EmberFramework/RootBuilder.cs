@@ -13,6 +13,7 @@ public class RootBuilder
     private readonly IConfigurationRoot _configurationRoot;
     private readonly ContainerBuilder _containerBuilder = new();
     private List<Type> _pluginLoaderTypes = [];
+    private IServiceCollection _infrastructures = new ServiceCollection();
     public IEnumerable<Type> PluginLoaderTypes => _pluginLoaderTypes;
     
     public RootBuilder(IConfigurationRoot configurationRoot)
@@ -28,10 +29,7 @@ public class RootBuilder
 
     public RootBuilder Infrastructures(Action<IServiceCollection, IConfiguration> registrar)
     {
-        var serviceCollection = new ServiceCollection();
-        registrar(serviceCollection, _configurationRoot);
-        
-        _containerBuilder.Populate(serviceCollection);
+        registrar(_infrastructures, _configurationRoot);
         return this;
     }
 
@@ -43,6 +41,11 @@ public class RootBuilder
 
     public IPluginRoot Build()
     {
+        _infrastructures.AddSingleton<IConfiguration>(_configurationRoot);
+        _infrastructures.AddSingleton(_configurationRoot);
+        
+        _containerBuilder.Populate(_infrastructures);
+
         return _containerBuilder.Build().Resolve<IPluginRoot>();
     }
     
