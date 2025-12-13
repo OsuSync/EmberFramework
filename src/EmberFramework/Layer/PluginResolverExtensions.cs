@@ -80,7 +80,7 @@ public static class PluginResolverExtensions
     {
         var pluginServices = await parent.Resolve<IEnumerable<IPlugin>>()
             .ToAsyncEnumerable()
-            .SelectAwait(p => p.BuildComponents(cancellationToken))
+            .Select((p, token) => p.BuildComponents(token))
             .ToListAsync(cancellationToken);
         
         return parent.BeginLifetimeScope((builder) =>

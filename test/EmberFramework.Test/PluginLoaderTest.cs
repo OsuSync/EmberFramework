@@ -26,7 +26,7 @@ public class PluginLoaderTest
         await pluginLoader.BuildScopeAsync(TestContext.Current.CancellationToken);
         var config = scope.Resolve<IConfiguration>();
         var pluginMetadataList = await PluginLoaderExtensions.EnumPluginFoldersAsync(config.GetPluginFolderPath()).ToAsyncEnumerable()
-            .SelectAwait(p => PluginLoaderExtensions.GetMetadataByPathAsync(p))
+            .Select(PluginLoaderExtensions.GetMetadataByPathAsync)
             .ToListAsync(TestContext.Current.CancellationToken);
 
         var plugins = await pluginLoader.ResolveServiceAsync<IPlugin>(TestContext.Current.CancellationToken)
@@ -40,7 +40,7 @@ public class PluginLoaderTest
         }
         
         var pluginMetadataList2 = await PluginLoaderExtensions.EnumPluginFoldersAsync(config.GetPluginFolderPath()).ToAsyncEnumerable()
-            .SelectAwait(p => PluginLoaderExtensions.GetMetadataByPathAsync(p))
+            .Select(PluginLoaderExtensions.GetMetadataByPathAsync)
             .ToListAsync(TestContext.Current.CancellationToken);
         
         Assert.Equal(pluginMetadataList, pluginMetadataList2);
@@ -57,7 +57,7 @@ public class PluginLoaderTest
             await pluginLoader.LoadAsync(pluginMetadata, TestContext.Current.CancellationToken);
         }
         var pluginMetadataList3 = await PluginLoaderExtensions.EnumPluginFoldersAsync(config.GetPluginFolderPath()).ToAsyncEnumerable()
-            .SelectAwait(p => PluginLoaderExtensions.GetMetadataByPathAsync(p))
+            .Select(PluginLoaderExtensions.GetMetadataByPathAsync)
             .ToListAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(pluginMetadataList, pluginMetadataList3);

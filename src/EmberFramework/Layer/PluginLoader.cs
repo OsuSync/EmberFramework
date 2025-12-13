@@ -63,7 +63,7 @@ public class PluginLoader(ILifetimeScope parent, IConfiguration config) : IPlugi
     {
         var path = config.GetPluginFolderPath();
         return PluginLoaderExtensions.EnumPluginFoldersAsync(path).ToAsyncEnumerable()
-            .SelectAwait(p => PluginLoaderExtensions.GetMetadataByPathAsync(p, cancellationToken));
+            .Select(PluginLoaderExtensions.GetMetadataByPathAsync);
     }
 
     public bool IsLoaded(PluginMetadata metadata)
