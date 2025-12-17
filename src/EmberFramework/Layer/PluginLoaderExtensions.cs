@@ -1,5 +1,9 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using EmberFramework.Abstraction.Layer.Plugin;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +15,7 @@ public static class PluginLoaderExtensions
     
     public static string GetPluginFolderPath(this IConfiguration configuration)
     {
-        var dir = configuration.GetSection(nameof(PluginLoader))["Path"] ?? PluginLoader.DefaultPluginFolder;
+        var dir = configuration.GetSection(nameof(AssemblyPluginLoader))["Path"] ?? AssemblyPluginLoader.DefaultPluginFolder;
 
         return Path.GetFullPath(dir);
     }
@@ -51,7 +55,7 @@ public static class PluginLoaderExtensions
         collection.AddSingleton(config);
         collection.AddSingleton(metadata);
         collection.AddSingleton(_ => metadata.MakeLocalAssemblyLoadContext());
-        collection.AddSingleton<IPluginResolver, PluginResolver>();
+        collection.AddSingleton<IPluginResolver, AssemblyPluginResolver>();
 
         return collection;
     }

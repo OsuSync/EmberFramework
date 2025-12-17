@@ -16,7 +16,7 @@ public class PluginLoaderExtensionTest
         var configRoot = (new ConfigurationBuilder()).AddInMemoryCollection().Build();
         
         var randStr = Guid.NewGuid().ToString();
-        configRoot.GetSection(nameof(PluginLoader))["Path"] = randStr;
+        configRoot.GetSection(nameof(AssemblyPluginLoader))["Path"] = randStr;
         var path = Path.Combine(Environment.CurrentDirectory, randStr);
         
         Assert.Equal(configRoot.GetPluginFolderPath(), path);
@@ -26,7 +26,7 @@ public class PluginLoaderExtensionTest
     public void TestGetPluginRootFromConfigurationReturnDefaultIfNotSetup()
     {
         var configRoot = new ConfigurationRoot([]);
-        var pluginsPath = Path.Combine(Environment.CurrentDirectory, PluginLoader.DefaultPluginFolder);
+        var pluginsPath = Path.Combine(Environment.CurrentDirectory, AssemblyPluginLoader.DefaultPluginFolder);
         
         Assert.Equal(pluginsPath, configRoot.GetPluginFolderPath());
     }
@@ -61,10 +61,10 @@ public class PluginLoaderExtensionTest
     [Fact]
     public void TestEnumAllPluginsFolder()
     {
-        var path = Path.Combine(Environment.CurrentDirectory, PluginLoader.DefaultPluginFolder);
+        var path = Path.Combine(Environment.CurrentDirectory, AssemblyPluginLoader.DefaultPluginFolder);
         var result = PluginLoaderExtensions.EnumPluginFoldersAsync(path).ToList();
         
-        var target = Path.Combine(Environment.CurrentDirectory, PluginLoader.DefaultPluginFolder, "EmberTest");
+        var target = Path.Combine(Environment.CurrentDirectory, AssemblyPluginLoader.DefaultPluginFolder, "EmberTest");
         Assert.Contains(result, x => x == target);
         Assert.Single(result);
     }

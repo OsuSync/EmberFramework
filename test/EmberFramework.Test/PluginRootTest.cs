@@ -20,7 +20,7 @@ public class PluginRootTest
         containerBuilder.RegisterType<ExceptionThrownExitHandler>().AsSelf().As<IGracefulExitHandler>().SingleInstance();
         containerBuilder.RegisterType<PluginRoot>().As<IPluginRoot>().SingleInstance();
         containerBuilder.RegisterInstance(new ConfigurationBuilder().AddInMemoryCollection().Build()).As<IConfiguration>().SingleInstance();
-        containerBuilder.RegisterType<PluginLoader>().As<IPluginLoader>().SingleInstance();
+        containerBuilder.RegisterType<AssemblyPluginLoader>().As<IPluginLoader>().SingleInstance();
         var scope = containerBuilder.Build();
         
         var handlerObj = scope.Resolve<TestHandler>();

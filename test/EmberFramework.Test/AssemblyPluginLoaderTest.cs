@@ -6,14 +6,14 @@ using Microsoft.Extensions.Configuration;
 
 namespace EmberFramework.Test;
 
-public class PluginLoaderTest
+public class AssemblyPluginLoaderTest
 {
     private ILifetimeScope BuildScope()
     {
         var containerBuilder = new ContainerBuilder();
         containerBuilder.RegisterType<PluginDummyServiceInParent>();
         containerBuilder.RegisterInstance<IConfiguration>(new ConfigurationBuilder().AddInMemoryCollection().Build());
-        containerBuilder.RegisterType<PluginLoader>().AsSelf().As<IPluginLoader>();
+        containerBuilder.RegisterType<AssemblyPluginLoader>().AsSelf().As<IPluginLoader>();
         return containerBuilder.Build();
     }
     

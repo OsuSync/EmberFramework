@@ -1,4 +1,7 @@
-﻿using Autofac;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using EmberFramework.Abstraction.Layer;
 using EmberFramework.Abstraction.Layer.Plugin;
@@ -13,7 +16,7 @@ public class RootBuilder
     private readonly IConfigurationRoot _configurationRoot;
     private readonly ContainerBuilder _containerBuilder = new();
     private List<Type> _pluginLoaderTypes = [];
-    private IServiceCollection _infrastructures = new ServiceCollection();
+    private readonly IServiceCollection _infrastructures = new ServiceCollection();
     public IEnumerable<Type> PluginLoaderTypes => _pluginLoaderTypes;
     
     public RootBuilder(IConfigurationRoot configurationRoot)
@@ -33,7 +36,7 @@ public class RootBuilder
         return this;
     }
 
-    public RootBuilder UseLoader<TLoader>() where TLoader : PluginLoader
+    public RootBuilder UseLoader<TLoader>() where TLoader : IPluginLoader
     {
         _containerBuilder.RegisterType<TLoader>().As<IPluginLoader>().SingleInstance();
         return this;

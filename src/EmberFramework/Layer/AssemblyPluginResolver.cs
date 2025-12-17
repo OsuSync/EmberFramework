@@ -1,10 +1,15 @@
-﻿using System.Runtime.Loader;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Loader;
+using System.Threading;
+using System.Threading.Tasks;
 using Autofac;
 using EmberFramework.Abstraction.Layer.Plugin;
 
 namespace EmberFramework.Layer;
 
-public class PluginResolver(
+public class AssemblyPluginResolver(
     ILifetimeScope parent,
     AssemblyLoadContext context) : IPluginResolver
 {

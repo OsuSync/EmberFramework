@@ -1,21 +1,24 @@
-﻿using System.Runtime.CompilerServices;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using Autofac;
-using System.Runtime.Loader;
-using System.Text.Json;
-using Autofac.Extensions.DependencyInjection;
 using EmberFramework.Abstraction.Layer.Plugin;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace EmberFramework.Layer;
 
-public class PluginLoader(ILifetimeScope parent, IConfiguration config) : IPluginLoader
+public class TypedPluginLoader(ILifetimeScope parent, IConfiguration config) : IPluginLoader
 {
-    
-    public const string DefaultPluginFolder = "plugins";
+    private static readonly Dictionary<PluginMetadata, Type> _registeredTypes = [];
+
+    public static void Register<T>() where T : IPlugin =>
+        _registeredTypes.Add(new PluginMetadata(typeof(T).Name), typeof(T));
     
     private readonly Dictionary<PluginMetadata, ILifetimeScope> _pluginContainers = [];
-
+    
     public async ValueTask BuildScopeAsync(CancellationToken cancellationToken = default)
     {
         await foreach (var metadata in GetPlugins(cancellationToken))
@@ -28,6 +31,7 @@ public class PluginLoader(ILifetimeScope parent, IConfiguration config) : IPlugi
             }
         }
     }
+
 
     public async IAsyncEnumerable<T> ResolveServiceAsync<T>(
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -44,6 +48,35 @@ public class PluginLoader(ILifetimeScope parent, IConfiguration config) : IPlugi
             }
         }
     }
+
+    public IAsyncEnumerable<PluginMetadata> GetPlugins(CancellationToken cancellationToken = new())
+    {
+        return _registeredTypes.Keys.ToAsyncEnumerable();
+    }
+
+    public bool IsLoaded(PluginMetadata metadata)
+    {
+        return _pluginContainers.ContainsKey(metadata);
+    }
+
+    public ValueTask LoadAsync(PluginMetadata metadata, CancellationToken cancellationToken = new())
+    {
+        if (IsLoaded(metadata)) return ValueTask.CompletedTask;
+        _pluginContainers.Add(metadata, parent.BeginLifetimeScope((builder) =>
+        {
+            builder.RegisterInstance(_registeredTypes[metadata]);
+            builder.RegisterType<TypedPluginResolver>().As<IPluginResolver>().SingleInstance();
+        }));
+        
+        return ValueTask.CompletedTask;
+    }
+
+    public async ValueTask UnloadAsync(PluginMetadata metadata, CancellationToken cancellationToken = new())
+    {
+        if (!_pluginContainers.Remove(metadata, out var container)) return;
+
+        await using var _ = container;
+    }
     
     public async ValueTask DisposeAsync()
     {
@@ -59,34 +92,4 @@ public class PluginLoader(ILifetimeScope parent, IConfiguration config) : IPlugi
         DisposeAsync().AsTask().Wait();
     }
 
-    public IAsyncEnumerable<PluginMetadata> GetPlugins(CancellationToken cancellationToken = default)
-    {
-        var path = config.GetPluginFolderPath();
-        return PluginLoaderExtensions.EnumPluginFoldersAsync(path).ToAsyncEnumerable()
-            .Select(PluginLoaderExtensions.GetMetadataByPathAsync);
-    }
-
-    public bool IsLoaded(PluginMetadata metadata)
-    {
-        return _pluginContainers.ContainsKey(metadata);
-    }
-
-    public ValueTask LoadAsync(PluginMetadata metadata, CancellationToken cancellationToken = default)
-    {
-        if (IsLoaded(metadata)) return ValueTask.CompletedTask;
-        
-        _pluginContainers.Add(metadata, parent.BeginLifetimeScope((builder) =>
-        {
-            builder.Populate(metadata.BuildPluginScope(config));
-        }));
-        
-        return ValueTask.CompletedTask;
-    }
-
-    public async ValueTask UnloadAsync(PluginMetadata metadata, CancellationToken cancellationToken = default)
-    {
-        if (!_pluginContainers.Remove(metadata, out var container)) return;
-
-        await using var _ = container;
-    }
 }

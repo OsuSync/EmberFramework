@@ -10,8 +10,9 @@ A lightweight plugin framework.
 var root = await RootBuilder
     .Boot()
     .Infrastructures((registry, config) => registry.AddSingleton(...))
-    .UseLoader<PluginLoader>() // load plugins from $cwd/plugins in default
-    .UseLoader<CustomLoader>() // support multiple loader
+    .UseLoader<AssemblyPluginLoader>() // load plugins from $cwd/plugins, each plugin in a separate folder
+    .UseLoader<TypedPluginLoader>() // use TypedPluginLoader.Register<TPlugin>() to register plugin type
+    .UseLoader<CustomLoader>() // support custom plugin loader
     .Build();
 
 await root.RunAsync(cancellationToken);
