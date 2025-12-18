@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using EmberFramework.Abstraction;
 using EmberFramework.Abstraction.Layer;
 using EmberFramework.Abstraction.Layer.Plugin;
 using EmberFramework.Layer;

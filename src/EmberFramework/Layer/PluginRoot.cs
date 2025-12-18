@@ -43,9 +43,20 @@ public class PluginRoot(
         return pluginLoaders.ToAsyncEnumerable()
             .SelectMany(loader => loader.ResolveServiceAsync<IExecutable>(cancellationToken));
     }
+
+    private async ValueTask InitializeInfrastructureAsync(CancellationToken cancellationToken = default)
+    {
+        var initializers = parent.Resolve<IEnumerable<IInfrastructureInitializer>>();
+
+        foreach (var infrastructureInitializer in initializers)
+        {
+            await infrastructureInitializer.InitializeAsync(cancellationToken);
+        }
+    }
     
     public async ValueTask RunAsync(CancellationToken cancellationToken = default)
     {
+        await InitializeInfrastructureAsync(cancellationToken);
         await BuildScopeAsync(cancellationToken);
         
         var allExecutables = await GetExecutablesAsync(cancellationToken)
